@@ -1,0 +1,38 @@
+version: '3'
+
+networks:
+  ansara:
+
+services:
+  app:
+    build: .
+
+    volumes:
+      - .:/tracker
+    environment:
+      - DB_NAME=postgres
+      - DB_USER=postgres
+      - DB_PASSWORD=postgres
+      - DB_HOST=host.docker.internal
+      - DB_PORT=5432
+    command: sh -c "python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
+
+    depends_on:
+      - db
+    networks:
+      - ansara
+
+
+  db:
+    image: postgres:13
+    environment:
+      POSTGRES_DB: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    networks:
+      - ansara
+
+volumes:
+  postgres_data:
